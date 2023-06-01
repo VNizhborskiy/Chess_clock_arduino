@@ -214,36 +214,20 @@ void draw_num(int min1, int sec1, int min2, int sec2, char s_min1, char s_sec1, 
 void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min1, char symb_sec1, char symb_min2, char symb_sec2, int increment) {
   int x = 1;  // счетчик для btn1, btn2
   int i = 1;  // счетчк для increment
-  int p = 0;
+  //int p = 0;
+  
   while (true) {
     btn_pl1.tick();
     btn_pl2.tick();
-    btn3.tick();
-    do {
-      u8g2.drawFrame(0, 0, 128, 64);
-      u8g2.setFont(u8g2_font_Georgia7px_tr);
-      u8g2.setCursor(20, 15);
-      u8g2.print("Press the Button,");
-      u8g2.setCursor(25, 36);
-      u8g2.print("if you are ready");
-      u8g2.setCursor(50, 56);
-      u8g2.print("to start");
-    } while (u8g2.nextPage());
-    while (p == 0) {
-      btn_pl1.tick();
-      btn_pl2.tick();
-      if (btn_pl1.press()) {
-        x = 2;
-        p++;
-        break;
-      } else if (btn_pl2.press()) {
-        x = 1;
-        p++;
-        break;
-      }
+    draw_num(minutes1, seconds1, minutes2, seconds2, '\0', '\0', '\0', '\0');
+    if (btn_pl1.press())
+    {
+      x = 2;
+      break;
     }
-
-    if (btn_pl1.press() || btn_pl2.press()) {
+    else if (btn_pl2.press())
+    {
+      x = 1;
       break;
     }
   }
@@ -368,7 +352,7 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
               break;
           }
 
-          continue;
+          //continue;
         }
         seconds1--;
       } else if (x % 2 == 0 && seconds2 != -1) {
@@ -403,7 +387,7 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
               break;
           }
 
-          continue;
+          //continue;
         }
         seconds2--;
       }
@@ -489,7 +473,7 @@ void menu() {
     do {
       battery_charge();
       u8g2.drawFrame(0, 0, 128, 64);
-      u8g2.setCursor(48, 15);
+      u8g2.setCursor(48, 14);
       u8g2.setFont(u8g2_font_Georgia7px_tr);
       u8g2.print("MENU");
       u8g2.setCursor(10, 30);
@@ -509,7 +493,7 @@ void menu() {
     do {
       battery_charge();
       u8g2.drawFrame(0, 0, 128, 64);
-      u8g2.setCursor(48, 15);
+      u8g2.setCursor(48, 14);
       u8g2.setFont(u8g2_font_Georgia7px_tr);
       u8g2.print("MENU");
       u8g2.setCursor(14, 30);
@@ -528,22 +512,22 @@ void battery_charge() {
   Serial.println(Vbat);
   if (3, 0 < Vbat < 3, 3) {
     do {
-      u8g2.drawXBMP(5, 5, 20, 11, battery1);
+      u8g2.drawXBMP(5, 4, 20, 10, battery1);
     } while (u8g2.nextPage());
   }
   if (3, 3 < Vbat < 3, 6) {
     do {
-      u8g2.drawXBMP(5, 5, 20, 11, battery2);
+      u8g2.drawXBMP(5, 4, 20, 10, battery2);
     } while (u8g2.nextPage());
   }
   if (3, 6 < Vbat < 3, 9) {
     do {
-      u8g2.drawXBMP(5, 5, 20, 11, battery3);
+      u8g2.drawXBMP(5, 4, 20, 10, battery3);
     } while (u8g2.nextPage());
   }
   if (3, 9 < Vbat < 4, 2) {
     do {
-      u8g2.drawXBMP(5, 5, 20, 11, battery4);
+      u8g2.drawXBMP(5, 4, 20, 10, battery4);
     } while (u8g2.nextPage());
   }
 }
@@ -557,7 +541,7 @@ void setup(void) {
 
 
     u8g2.drawFrame(0, 0, 128, 64);
-    u8g2.setCursor(48, 15);
+    u8g2.setCursor(48, 14);
     u8g2.setFont(u8g2_font_Georgia7px_tr);
     u8g2.print("MENU");
     u8g2.setCursor(16, 30);
@@ -591,48 +575,36 @@ void loop(void) {
             u8g2.clearDisplay();
             draw_num(1, 0, 1, 0, '\0', '\0', '\0', '\0');
             while (true) {
-              btn1.tick();
-              btn2.tick();
-              if (btn1.click() || btn2.click()) {
-                u8g2.clearDisplay();
-                Timer(1, 0, 1, 0, '\0', '\0', '\0', '\0', 0);
-              }
+
+              u8g2.clearDisplay();
+              Timer(1, 0, 1, 0, '\0', '\0', '\0', '\0', 0);
             }
             break;
           case 2:
             u8g2.clearDisplay();
             draw_num(3, 0, 3, 0, '\0', '\0', '\0', '\0');
             while (true) {
-              btn1.tick();
-              btn2.tick();
-              if (btn1.click() || btn2.click()) {
-                u8g2.clearDisplay();
-                Timer(3, 0, 3, 0, '\0', '\0', '\0', '\0', 2);
-              }
+              u8g2.clearDisplay();
+              Timer(3, 0, 3, 0, '\0', '\0', '\0', '\0', 2);
             }
             break;
           case 3:
             u8g2.clearDisplay();
             draw_num(10, 0, 10, 0, '\0', '\0', '\0', '\0');
             while (true) {
-              btn1.tick();
-              btn2.tick();
-              if (btn1.click() || btn2.click()) {
-                u8g2.clearDisplay();
-                Timer(10, 0, 10, 0, '\0', '\0', '\0', '\0', 0);
-              }
+
+              u8g2.clearDisplay();
+              Timer(10, 0, 10, 0, '\0', '\0', '\0', '\0', 0);
             }
             break;
           case 4:
             u8g2.clearDisplay();
             draw_num(30, 0, 30, 0, '\0', '\0', '\0', '\0');
             while (true) {
-              btn1.tick();
-              btn2.tick();
-              if (btn1.click() || btn2.click()) {
-                u8g2.clearDisplay();
-                Timer(30, 0, 30, 0, '\0', '\0', '\0', '\0', 0);
-              }
+
+
+              u8g2.clearDisplay();
+              Timer(30, 0, 30, 0, '\0', '\0', '\0', '\0', 0);
             }
             break;
         }
@@ -678,7 +650,7 @@ void loop(void) {
       btn2.tick();
       btn3.tick();
 
-      if (btn1.click() || count1 == 1) {
+      if (btn2.click() || count1 == 1) {
         count1 = 0;
 
         switch (g1) {
@@ -702,11 +674,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('#', '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -734,11 +706,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '#', '\n', '\n', '\n', '\n', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -763,11 +735,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '#', '\n', '\n', '\n', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -793,11 +765,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '\n', '#', '\n', '\n', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -829,11 +801,11 @@ void loop(void) {
                   u8g2.print(inc);
                 } while (u8g2.nextPage());
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -843,21 +815,17 @@ void loop(void) {
 
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 while (true) {
-                  btn1.tick();
-                  btn2.tick();
-                  if (btn1.click() || btn2.click()) {
-                    u8g2.clearDisplay();
-                    Timer(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n', inc);
-                  }
+
+                  u8g2.clearDisplay();
+                  Timer(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n', inc);
                 }
               }
+              g1 = 1;
+              break;
             }
-            g1 = 1;
-            break;
         }
       }
-
-      if (btn2.click() || count2 == 1) {
+      if (btn1.click() || count2 == 1) {
         count2 = 0;
 
         switch (g2) {
@@ -880,11 +848,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '\n', '\n', '#', '\n', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -909,11 +877,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '\n', '\n', '\n', '#', '\n', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -938,11 +906,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '\n', '\n', '\n', '\n', '#', '\n', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -967,11 +935,11 @@ void loop(void) {
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 new_custom_time('\n', '\n', '\n', '\n', '\n', '\n', '\n', '#', '\n');
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -1002,11 +970,11 @@ void loop(void) {
                   u8g2.print(inc);
                 } while (u8g2.nextPage());
               }
-              if (btn1.click()) {
+              if (btn2.click()) {
                 count1++;
 
                 break;
-              } else if (btn2.click()) {
+              } else if (btn1.click()) {
 
                 count2++;
                 break;
@@ -1014,12 +982,10 @@ void loop(void) {
 
                 draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
                 while (true) {
-                  btn1.tick();
-                  btn2.tick();
-                  if (btn1.click() || btn2.click()) {
-                    u8g2.clearDisplay();
-                    Timer(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n', inc);
-                  }
+
+
+                  u8g2.clearDisplay();
+                  Timer(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n', inc);
                 }
               }
             }
@@ -1030,5 +996,4 @@ void loop(void) {
     }
   }
 }
-
 // 29.05 4:32
