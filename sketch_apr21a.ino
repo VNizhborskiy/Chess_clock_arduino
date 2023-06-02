@@ -215,18 +215,15 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
   int x = 1;  // счетчик для btn1, btn2
   int i = 1;  // счетчк для increment
   //int p = 0;
-  
+
   while (true) {
     btn_pl1.tick();
     btn_pl2.tick();
     draw_num(minutes1, seconds1, minutes2, seconds2, '\0', '\0', '\0', '\0');
-    if (btn_pl1.press())
-    {
+    if (btn_pl1.press()) {
       x = 2;
       break;
-    }
-    else if (btn_pl2.press())
-    {
+    } else if (btn_pl2.press()) {
       x = 1;
       break;
     }
@@ -507,25 +504,27 @@ void menu() {
 }
 
 void battery_charge() {
-  float Vbat = (analogRead(A1) * 5.1) / 1024.0;
-  Serial.println('V');
-  Serial.println(Vbat);
-  if (3, 0 < Vbat < 3, 3) {
+  float Vbat = (analogRead(A1) * 5.35) / 1024.0;
+  u8g2.setCursor(100, 11);
+  u8g2.setFont(u8g2_font_chikita_tr);
+  u8g2.print(Vbat);
+  u8g2.print('V');
+  if (Vbat > 3.0 && Vbat < 3.3) {
     do {
       u8g2.drawXBMP(5, 4, 20, 10, battery1);
     } while (u8g2.nextPage());
   }
-  if (3, 3 < Vbat < 3, 6) {
+  if (Vbat > 3.3 && Vbat < 3.6) {
     do {
       u8g2.drawXBMP(5, 4, 20, 10, battery2);
     } while (u8g2.nextPage());
   }
-  if (3, 6 < Vbat < 3, 9) {
+  if (Vbat > 3.6 && Vbat < 3.9) {
     do {
       u8g2.drawXBMP(5, 4, 20, 10, battery3);
     } while (u8g2.nextPage());
   }
-  if (3, 9 < Vbat < 4, 2) {
+  if (Vbat > 3.9 && Vbat < 4.2) {
     do {
       u8g2.drawXBMP(5, 4, 20, 10, battery4);
     } while (u8g2.nextPage());
@@ -786,6 +785,7 @@ void loop(void) {
               btn2.tick();
               btn3.tick();
               if (btn3.click()) {
+                Serial.println("Increment pl1 exist");
                 inc++;
                 if (inc > 5) {
                   inc = 0;
@@ -820,9 +820,9 @@ void loop(void) {
                   Timer(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n', inc);
                 }
               }
-              g1 = 1;
-              break;
             }
+            g1 = 1;
+            break;
         }
       }
       if (btn1.click() || count2 == 1) {
@@ -956,6 +956,7 @@ void loop(void) {
               btn2.tick();
               btn3.tick();
               if (btn3.click()) {
+                //Serial.println("Increment pl2 exist");
                 inc++;
                 if (inc > 5) {
                   inc = 0;
