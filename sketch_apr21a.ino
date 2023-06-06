@@ -1,6 +1,7 @@
 #include <U8g2lib.h>
 #include <EncButton.h>
 
+//#define EB_CLICK 1000
 U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, /* CS=*/10, /* reset=*/8);
 
 EncButton<EB_TICK, 7> btn1;     // button pl1
@@ -305,19 +306,25 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
     btn3.tick();
     btn_pl1.tick();
     btn_pl2.tick();
+
     if (millis() - timing > 1000) {
       timing = millis();
 
 
-      if (btn_pl1.press() || btn_pl2.press()) {
-        x++;
+      if (btn_pl1.press()) {
+        x = 2;
         if (increment != 0) {
           i++;
         }
       }
-
+      if (btn_pl2.press()) {
+        x = 3;
+        if (increment != 0) {
+          i++;
+        }
+      }
       if (x % 2 != 0 && seconds1 != -1) {
-        Serial.println(i);
+        //Serial.println(i);
         if (i > 1 && x > 1) {
           seconds2 += increment;
           i = 1;
@@ -504,6 +511,7 @@ void menu() {
 }
 
 void battery_charge() {
+  Serial.println(analogRead(A1));
   float Vbat = (analogRead(A1) * 5.35) / 1024.0;
   u8g2.setCursor(100, 11);
   u8g2.setFont(u8g2_font_chikita_tr);
@@ -997,4 +1005,4 @@ void loop(void) {
     }
   }
 }
-// 29.05 4:32
+// 06.06 19:12
