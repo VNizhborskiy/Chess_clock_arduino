@@ -1,8 +1,10 @@
 #include <U8g2lib.h>
+#include <EEPROM.h>
 #include <EncButton.h>
 
+
 //#define EB_CLICK 1000
-U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, /* CS=*/10, /* reset=*/8);
+U8G2_ST7920_128X64_F_HW_SPI u8g2(U8G2_R0, /* CS=*/10, /* reset=*/9);
 
 EncButton<EB_TICK, 7> btn1;     // button pl1
 EncButton<EB_TICK, 6> btn2;     // button pl2
@@ -10,6 +12,7 @@ EncButton<EB_TICK, 5> btn3;     // button pause
 EncButton<EB_TICK, 4> btn_pl1;  // button game pl1
 EncButton<EB_TICK, 3> btn_pl2;  // button game pl2
 
+int led = 9;
 
 static const unsigned char battery1[] U8X8_PROGMEM = {
 
@@ -214,7 +217,8 @@ void draw_num(int min1, int sec1, int min2, int sec2, char s_min1, char s_sec1, 
 
 void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min1, char symb_sec1, char symb_min2, char symb_sec2, int increment) {
   int x = 1;  // счетчик для btn1, btn2
-  int i = 1;  // счетчк для increment
+  //int i = 1;   // счетчк для increment pl1
+  //int i2 = 1;  // счетчик для increment pl2
   //int p = 0;
 
   while (true) {
@@ -259,17 +263,17 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
       do {
         draw_num(minutes1, seconds1, minutes2, seconds2, '\0', '\0', '\0', '\0');
       } while (u8g2.nextPage());
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
       while (true) {
         btn3.tick();
@@ -282,17 +286,17 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
       do {
         draw_num(minutes1, seconds1, minutes2, seconds2, '\0', '\0', '\0', '\0');
       } while (u8g2.nextPage());
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
-      digitalWrite(8, LOW);
+      analogWrite(9, 0);
       delay(500);
-      digitalWrite(8, HIGH);
+      analogWrite(9, 254);
       delay(500);
       while (true) {
         btn3.tick();
@@ -313,57 +317,18 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
 
       if (btn_pl1.press()) {
         x = 2;
-        if (increment != 0) {
-          i++;
-        }
       }
       if (btn_pl2.press()) {
         x = 3;
-        if (increment != 0) {
-          i++;
-        }
       }
-      if (x % 2 != 0 && seconds1 != -1) {
-        //Serial.println(i);
-        if (i > 1 && x > 1) {
-          seconds2 += increment;
-          i = 1;
 
-          switch (seconds2) {
-            case 60:
-              seconds2 = 0;
-              minutes2++;
-              break;
-            case 61:
-              seconds2 = 1;
-              minutes2++;
-              break;
-            case 62:
-              seconds2 = 2;
-              minutes2++;
-              break;
-            case 63:
-              seconds2 = 3;
-              minutes2++;
-              break;
-            case 64:
-              seconds2 = 4;
-              minutes2++;
-              break;
-            case 65:
-              seconds2 = 5;
-              minutes2++;
-              break;
-          }
+      if (btn_pl2.release()) {
+        if (increment != 0) {
+          //i++;
 
-          //continue;
-        }
-        seconds1--;
-      } else if (x % 2 == 0 && seconds2 != -1) {
-        if (i > 1 && x > 1) {
           seconds1 += increment;
-          i = 1;
 
+          //i = 1;
           switch (seconds1) {
             case 60:
               seconds1 = 0;
@@ -390,11 +355,56 @@ void Timer(int minutes1, int seconds1, int minutes2, int seconds2, char symb_min
               minutes1++;
               break;
           }
-
-          //continue;
         }
+      }
+      if (btn_pl1.release()) {
+        if (increment != 0) {
+          //i2++;
+
+          seconds2 += increment;
+
+          //i2 = 1;
+          switch (seconds2) {
+            case 60:
+              seconds2 = 0;
+              minutes2++;
+              break;
+            case 61:
+              seconds2 = 1;
+              minutes2++;
+              break;
+            case 62:
+              seconds2 = 2;
+              minutes2++;
+              break;
+            case 63:
+              seconds2 = 3;
+              minutes2++;
+              break;
+            case 64:
+              seconds2 = 4;
+              minutes2++;
+              break;
+            case 65:
+              seconds2 = 5;
+              minutes2++;
+              break;
+          }
+        }
+      }
+
+      if (x % 2 != 0 && seconds1 != -1) {
+
+        seconds1--;
+      }
+
+      if (x % 2 == 0 && seconds2 != -1) {
+
         seconds2--;
       }
+
+
+
 
       // Проверки
       if (seconds1 == -1 && minutes1 != 0 && x % 2 != 0) {
@@ -469,7 +479,8 @@ int k = 0;  // счетчик для переключения курсора men
 
 void menu() {
 
-  if (k % 2 != 0) {
+  if (k % 2 != 0 && k == 1) {
+    i = 0;
     i++;
 
     //Serial.println(k);
@@ -477,86 +488,136 @@ void menu() {
     do {
       battery_charge();
       u8g2.drawFrame(0, 0, 128, 64);
-      u8g2.setCursor(48, 14);
+      u8g2.setCursor(48, 13);
       u8g2.setFont(u8g2_font_Georgia7px_tr);
       u8g2.print("MENU");
-      u8g2.setCursor(10, 30);
+      u8g2.setCursor(10, 26);
       u8g2.setFont(u8g2_font_chikita_tr);
       u8g2.print("# Presets");
-      u8g2.setCursor(16, 45);
+      u8g2.setCursor(16, 41);
       u8g2.setFont(u8g2_font_chikita_tr);
       u8g2.print(" New custom time");
+      u8g2.setCursor(16, 56);
+      u8g2.setFont(u8g2_font_chikita_tr);
+      u8g2.print(" Settings");
+
     } while (u8g2.nextPage());
   }
 
   else if (k % 2 == 0 && k != 0) {
-    i++;
+    i = 0;
+    i += 2;
 
     //Serial.println(k);
     u8g2.clearDisplay();
     do {
       battery_charge();
       u8g2.drawFrame(0, 0, 128, 64);
-      u8g2.setCursor(48, 14);
+      u8g2.setCursor(48, 13);
       u8g2.setFont(u8g2_font_Georgia7px_tr);
       u8g2.print("MENU");
-      u8g2.setCursor(14, 30);
+      u8g2.setCursor(14, 26);
       u8g2.setFont(u8g2_font_chikita_tr);
       u8g2.print("  Presets");
-      u8g2.setCursor(10, 45);
+      u8g2.setCursor(10, 41);
       u8g2.setFont(u8g2_font_chikita_tr);
       u8g2.print("# New custom time");
+      u8g2.setCursor(16, 56);
+      u8g2.setFont(u8g2_font_chikita_tr);
+      u8g2.print(" Settings");
+    } while (u8g2.nextPage());
+  } else if (k % 2 != 0 && k == 3) {
+    k = 0;
+    i = 0;
+    i += 3;
+    u8g2.clearDisplay();
+    do {
+      battery_charge();
+      u8g2.drawFrame(0, 0, 128, 64);
+      u8g2.setCursor(48, 13);
+      u8g2.setFont(u8g2_font_Georgia7px_tr);
+      u8g2.print("MENU");
+      u8g2.setCursor(14, 26);
+      u8g2.setFont(u8g2_font_chikita_tr);
+      u8g2.print("  Presets");
+      u8g2.setCursor(16, 41);
+      u8g2.setFont(u8g2_font_chikita_tr);
+      u8g2.print(" New custom time");
+      u8g2.setCursor(10, 56);
+      u8g2.setFont(u8g2_font_chikita_tr);
+      u8g2.print("# Settings");
     } while (u8g2.nextPage());
   }
 }
 
 void battery_charge() {
-  Serial.println(analogRead(A1));
+
   float Vbat = (analogRead(A1) * 5.35) / 1024.0;
-  u8g2.setCursor(100, 11);
+  u8g2.setCursor(97, 11);
   u8g2.setFont(u8g2_font_chikita_tr);
   u8g2.print(Vbat);
   u8g2.print('V');
   if (Vbat > 3.0 && Vbat < 3.3) {
     do {
-      u8g2.drawXBMP(5, 4, 20, 10, battery1);
+      u8g2.drawXBMP(5, 3, 20, 10, battery1);
     } while (u8g2.nextPage());
   }
   if (Vbat > 3.3 && Vbat < 3.6) {
     do {
-      u8g2.drawXBMP(5, 4, 20, 10, battery2);
+      u8g2.drawXBMP(5, 3, 20, 10, battery2);
     } while (u8g2.nextPage());
   }
   if (Vbat > 3.6 && Vbat < 3.9) {
     do {
-      u8g2.drawXBMP(5, 4, 20, 10, battery3);
+      u8g2.drawXBMP(5, 3, 20, 10, battery3);
     } while (u8g2.nextPage());
   }
   if (Vbat > 3.9 && Vbat < 4.2) {
     do {
-      u8g2.drawXBMP(5, 4, 20, 10, battery4);
+      u8g2.drawXBMP(5, 3, 20, 10, battery4);
     } while (u8g2.nextPage());
   }
 }
 
+int LEDbright = 0;
+
+void setBright() {
+  EEPROM.update(0, LEDbright);
+  analogWrite(led, LEDbright);
+}
+
+
+
 void setup(void) {
   Serial.begin(9600);
+
+
   u8g2.begin();
   u8g2.firstPage();
+
+  pinMode(led, OUTPUT);
+  analogWrite(led, EEPROM.read(0));
+
+  Serial.println("BRIGHTNESS IS EQUAL TO");
+  Serial.println(EEPROM.read(0));
+
   battery_charge();
   do {
 
 
     u8g2.drawFrame(0, 0, 128, 64);
-    u8g2.setCursor(48, 14);
+    u8g2.setCursor(48, 13);
     u8g2.setFont(u8g2_font_Georgia7px_tr);
     u8g2.print("MENU");
-    u8g2.setCursor(16, 30);
+    u8g2.setCursor(16, 26);
     u8g2.setFont(u8g2_font_chikita_tr);
     u8g2.print(" Presets");
-    u8g2.setCursor(16, 45);
+    u8g2.setCursor(16, 41);
     u8g2.setFont(u8g2_font_chikita_tr);
     u8g2.print(" New custom time");
+    u8g2.setCursor(16, 56);
+    u8g2.setFont(u8g2_font_chikita_tr);
+    u8g2.print(" Settings");
   } while (u8g2.nextPage());
 }
 
@@ -568,7 +629,7 @@ void loop(void) {
     menu();
   }
 
-  if (btn3.hold() && i % 2 != 0) {
+  if (btn3.hold() && i == 1) {
     u8g2.clearDisplay();
     presets('\0', '\0', '\0', '\0');
 
@@ -647,7 +708,7 @@ void loop(void) {
       }
     }
   }
-  if (btn3.hold() && i % 2 == 0 && i != 0) {
+  if (btn3.hold() && i == 2) {
 
     u8g2.clearDisplay();
     draw_num(min_us1, sec_us1, min_us2, sec_us2, '\n', '\n', '\n', '\n');
@@ -793,7 +854,7 @@ void loop(void) {
               btn2.tick();
               btn3.tick();
               if (btn3.click()) {
-                Serial.println("Increment pl1 exist");
+
                 inc++;
                 if (inc > 5) {
                   inc = 0;
@@ -1004,5 +1065,111 @@ void loop(void) {
       }
     }
   }
+  if (btn3.hold() && i == 3) {
+    u8g2.clearDisplay();
+    int counter1 = 0;
+    int c_br = 0;
+    do {
+
+      u8g2.drawFrame(0, 0, 128, 64);
+      u8g2.setCursor(35, 10);
+      u8g2.setFont(u8g2_font_Georgia7px_tr);
+      u8g2.print("Brightness");
+      u8g2.drawLine(20, 32, 108, 32);
+
+    } while (u8g2.nextPage());
+
+
+    while (true) {
+      btn3.tick();
+
+      if (btn3.click()) {
+        counter1++;
+        c_br++;
+        if (c_br == 1) {
+          LEDbright = 10;
+          setBright();
+          do {
+            u8g2.clearDisplay();
+            u8g2.drawFrame(0, 0, 128, 64);
+            u8g2.setCursor(35, 10);
+            u8g2.setFont(u8g2_font_Georgia7px_tr);
+            u8g2.print("Brightness");
+            u8g2.drawLine(20, 32, 108, 32);
+            u8g2.drawLine(20, 27, 20, 37);
+          } while (u8g2.nextPage());
+        }
+        if (c_br == 2) {
+          LEDbright = 71;
+          setBright();
+          do {
+            u8g2.clearDisplay();
+            u8g2.drawFrame(0, 0, 128, 64);
+            u8g2.setCursor(35, 10);
+            u8g2.setFont(u8g2_font_Georgia7px_tr);
+            u8g2.print("Brightness");
+            u8g2.drawLine(20, 32, 108, 32);
+            u8g2.drawLine(42, 27, 42, 37);
+          } while (u8g2.nextPage());
+        }
+        if (c_br == 3) {
+          LEDbright = 132;
+          setBright();
+          do {
+            u8g2.clearDisplay();
+            u8g2.drawFrame(0, 0, 128, 64);
+            u8g2.setCursor(35, 10);
+            u8g2.setFont(u8g2_font_Georgia7px_tr);
+            u8g2.print("Brightness");
+            u8g2.drawLine(20, 32, 108, 32);
+            u8g2.drawLine(64, 27, 64, 37);
+          } while (u8g2.nextPage());
+        }
+        if (c_br == 4) {
+          LEDbright = 193;
+          setBright();
+          do {
+            u8g2.clearDisplay();
+            u8g2.drawFrame(0, 0, 128, 64);
+            u8g2.setCursor(35, 10);
+            u8g2.setFont(u8g2_font_Georgia7px_tr);
+            u8g2.print("Brightness");
+            u8g2.drawLine(20, 32, 108, 32);
+            u8g2.drawLine(86, 27, 86, 37);
+          } while (u8g2.nextPage());
+        }
+        if (c_br == 5) {
+          LEDbright = 254;
+          setBright();
+          do {
+            u8g2.clearDisplay();
+            u8g2.drawFrame(0, 0, 128, 64);
+            u8g2.setCursor(35, 10);
+            u8g2.setFont(u8g2_font_Georgia7px_tr);
+            u8g2.print("Brightness");
+            u8g2.drawLine(20, 32, 108, 32);
+            u8g2.drawLine(108, 27, 108, 37);
+          } while (u8g2.nextPage());
+          c_br = 0;
+        }
+      }
+      if (btn3.hold() && counter1 > 0) {
+        i = 0;
+        do {
+          u8g2.clearDisplay();
+          u8g2.drawFrame(0, 0, 128, 64);
+          u8g2.setCursor(35, 10);
+          u8g2.setFont(u8g2_font_Georgia7px_tr);
+          u8g2.print("Brightness");
+          u8g2.setCursor(40, 44);
+          u8g2.setFont(u8g2_font_chikita_tr);
+          u8g2.print("Selected!");
+        } while (u8g2.nextPage());
+
+        break;
+      }
+    }
+  }
 }
+
 // 06.06 19:12
